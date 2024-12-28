@@ -2,6 +2,7 @@ const paypal = require("../../helpers/paypal");
 const Order = require("../../models/Order");
 const Cart = require("../../models/Cart");
 const Product = require("../../models/Product");
+const Excel = require("exceljs");
 
 const createOrder = async (req, res) => {
   try {
@@ -198,10 +199,68 @@ const getOrderDetails = async (req, res) => {
     });
   }
 };
+// Thêm hàm xuất Excel
+
+const exportOrdersToExcel = async (req, res) => {
+  try {
+    const orders = await Order.find({}).populate("cartItems.productId");
+
+    if (!orders.length) {
+      return res.status(404).json({
+        success: false,
+        message: "No orders found!",
+      });
+    }
+
+    // Chuyển đổi dữ liệu đơn hàng
+    const data = orders.map((order) => ({
+      OrderID: order._id.toString(), // Chuyển ObjectId thành string
+      UserID: order.userId.toString(),
+      TotalAmount: parseFloat(order.totalAmount).toFixed(2),
+      OrderStatus: order.orderStatus,
+      PaymentStatus: order.paymentStatus,
+      OrderDate: order.orderDate
+        ? new Date(order.orderDate).toLocaleDateString()
+        : "N/A",
+    }));
+
+    // Tạo workbook và worksheet
+    const workbook = new xlsx.Workbook();
+    const worksheet = workbook.addWorksheet("Orders");
+
+    // Thêm headers
+    const headers = Object.keys(data[0]);
+    worksheet.addRow(headers);
+
+    // Thêm data
+    data.forEach((order) => {
+      worksheet.addRow(Object.values(order));
+    });
+
+    // Tạo buffer
+    const buffer = await workbook.xlsx.writeBuffer();
+
+    // Set headers và gửi response
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader("Content-Disposition", "attachment; filename=orders.xlsx");
+    res.send(buffer);
+  } catch (error) {
+    console.error("Export error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error exporting to Excel",
+      error: error.message,
+    });
+  }
+};
 
 module.exports = {
   createOrder,
   capturePayment,
   getAllOrdersByUser,
   getOrderDetails,
+  exportOrdersToExcel,
 };

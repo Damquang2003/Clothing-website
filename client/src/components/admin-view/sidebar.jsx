@@ -11,19 +11,19 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../ui/sheet";
 const adminSidebarMenuItems = [
   {
     id: "dashboard",
-    label: "Dashboard",
+    label: "Bảng điều khiển",
     path: "/admin/dashboard",
     icon: <LayoutDashboard />,
   },
   {
     id: "products",
-    label: "Products",
+    label: "Các sản phẩm",
     path: "/admin/products",
     icon: <ShoppingBasket />,
   },
   {
     id: "orders",
-    label: "Orders",
+    label: "Đơn hàng",
     path: "/admin/orders",
     icon: <BadgeCheck />,
   },

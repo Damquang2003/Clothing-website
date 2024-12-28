@@ -58,7 +58,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
       if (data?.payload?.success) {
         dispatch(fetchCartItems(user?.id));
         toast({
-          title: "Product is added to cart",
+          title: "Sản phẩm đã được thêm vào giỏ hàng",
         });
       }
     });
@@ -86,7 +86,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
         setReviewMsg("");
         dispatch(getReviews(productDetails?._id));
         toast({
-          title: "Review added successfully!",
+          title: "Đã thêm đánh giá thành công!",
         });
       }
     });
